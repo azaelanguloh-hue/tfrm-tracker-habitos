@@ -10,7 +10,7 @@ CFG_PATH = Path(__file__).parent / "habitos_config.json"
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
-@st.cache_data(show_spinner=False)
+# ⚠️ IMPORTANTE: NO cacheamos el config para evitar que se quede “pegado” con la versión vieja
 def load_cfg():
     return json.loads(CFG_PATH.read_text(encoding="utf-8"))
 
@@ -27,7 +27,7 @@ def load_state() -> dict:
         return json.loads(STATE_FILE.read_text(encoding="utf-8"))
     return {
         "goal": "",
-        "days": {str(d): {h: False for h in HABITS} for d in range(1, DAYS+1)},
+        "days": {str(d): {h: False for h in HABITS} for d in range(1, DAYS + 1)},
         "saved_at": None,
     }
 
@@ -38,32 +38,33 @@ def save_state(state: dict):
 def pick_phrase():
     return random.choice(PHRASES) if PHRASES else "¡Buen trabajo!"
 
-# ---------- UI Styles (big buttons / mobile friendly) ----------
+# UI grande para móvil
 st.markdown("""
 <style>
 div[data-testid="stTextInput"] input { font-size: 18px; padding: 14px 12px; }
 div[data-testid="stSelectbox"] div { font-size: 18px; }
-button[kind="primary"] { height: 54px; font-size: 18px; border-radius: 14px; }
-button[kind="secondary"] { height: 50px; font-size: 16px; border-radius: 14px; }
+button[kind="primary"] { height: 52px; font-size: 18px; border-radius: 14px; }
+button[kind="secondary"] { height: 48px; font-size: 16px; border-radius: 14px; }
 div[data-testid="stCheckbox"] label { font-size: 18px; }
 
-/* Monthly grid (responsive) */
+/* Grid mensual responsive */
 .month-grid{
   display:grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap:10px;
 }
-.day-chip{
-  border:1px solid rgba(0,0,0,0.10);
-  border-radius:14px;
-  padding:10px 8px;
-  text-align:center;
-  font-weight:700;
-  background: rgba(255,255,255,0.65);
+@media (max-width: 640px){
+  .month-grid{ grid-template-columns: repeat(4, 1fr); }
 }
-.day-chip .badge{ font-size:18px; display:block; line-height:1; margin-top:6px; }
-@media (max-width: 480px){
-  .month-grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); gap:8px; }
+.day-chip{
+  padding:10px 10px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.9);
+  font-size:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -73,33 +74,28 @@ st.caption("Palomea tu progreso día con día. Sin perfección. Con constancia."
 
 state = load_state()
 
-# Goal
 st.subheader("¿Qué quiero lograr este mes?")
 goal = st.text_input("Objetivo (corto):", value=state.get("goal", ""))
 state["goal"] = goal
 
-# Retos
 st.subheader("Retos del mes")
 for r in RETOS:
     st.markdown(f"- **{r}**")
 
 st.markdown("---")
 
-# Day selector
 st.subheader("Mis hábitos")
-day = st.selectbox("Día:", list(range(1, DAYS+1)), index=0)
+day = st.selectbox("Día:", list(range(1, DAYS + 1)), index=0)
 st.caption("Marca lo que lograste hoy.")
 
 day_key = str(day)
 day_data = state["days"].get(day_key, {h: False for h in HABITS})
-
 new_day_data = {}
 for h in HABITS:
     new_day_data[h] = st.checkbox(h, value=bool(day_data.get(h, False)), key=f"{day}_{h}")
 
 state["days"][day_key] = new_day_data
 
-# Save/Clear buttons
 colA, colB = st.columns([1, 1])
 with colA:
     if st.button("Guardar mi día", type="primary", use_container_width=True):
@@ -113,25 +109,25 @@ with colB:
 
 st.markdown("---")
 
-# Monthly view - responsive HTML grid
-st.subheader("Vista mensual")
-st.caption("Un vistazo rápido a tu avance por día.")
+st.subheader("Vista mensual (simple)")
+st.caption("Cada día muestra tu nivel de avance (solo un vistazo).")
 
 def badge(c):
     if c == 0: return "⬜"
     if c <= 3: return "🟠"
     if c <= 7: return "🟡"
-    if c <= 9: return "🟢"
+    if c <= 10: return "🟢"
     return "✅"
 
-chips = []
-for d in range(1, DAYS+1):
+chips_html = '<div class="month-grid">'
+for d in range(1, DAYS + 1):
     dd = state["days"].get(str(d), {})
     count = sum(1 for v in dd.values() if v)
-    chips.append(f'<div class="day-chip">{d}<span class="badge">{badge(count)}</span></div>')
+    chips_html += f'<div class="day-chip"><b>{d}</b><span>{badge(count)}</span></div>'
+chips_html += "</div>"
 
-st.markdown(f'<div class="month-grid">{"".join(chips)}</div>', unsafe_allow_html=True)
-st.caption("Leyenda: ⬜ 0 | 🟠 1–3 | 🟡 4–7 | 🟢 8–9 | ✅ 10+")
+st.markdown(chips_html, unsafe_allow_html=True)
+st.caption("Leyenda: ⬜ 0 | 🟠 1–3 | 🟡 4–7 | 🟢 8–10 | ✅ 11+")
 
 if state.get("saved_at"):
     st.caption(f"Último guardado: {state['saved_at']}")
