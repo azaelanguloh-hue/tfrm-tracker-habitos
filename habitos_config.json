@@ -6,38 +6,23 @@
     "Meditar",
     "Escribir mi plan del día",
     "Ejercicio",
-    "Tomar Matcha",
-    "Leer 15 min",
-    "Omega 3",
-    "Aloe Vera",
+    "Tomar mis suplementos (si aplica)",
     "Kéfir",
     "Proteína",
     "Tomar 2 lts de agua",
     "Agradecer",
     "Dormir 8 horas"
   ],
-  "months": {
-    "Mes 1": {
-      "retos": [
-        "Reto 1: Despertar temprano diario",
-        "Reto 2: Tomar 2 litros de agua diario",
-        "Reto 3: Hacer mínimo 30 min de ejercicio diario",
-        "Reto 4: Meditar todos los días"
-      ]
-    },
-    "Mes 2": {
-      "retos": [
-        "Reto 5: Dejar el celular 1 hora antes de dormir",
-        "Reto 6: Camina 10,000 pasos al día",
-        "Reto 7: Toma 5–10 min de sol natural al día"
-      ]
-    }
-  },
+  "retos": [
+    "Reto 1: Despertar temprano diario",
+    "Reto 2: Tomar 2 litros de agua diario",
+    "Reto 3: Hacer mínimo 30 min de ejercicio diario",
+    "Reto 4: Meditar todos los días"
+  ],
   "motivational_phrases": [
     "Calma. Respira. Vuelve. Continúa.",
     "No buscamos perfección, buscamos constancia.",
     "Hoy es progreso aunque sea pequeño.",
-    "2 o 3 hábitos fuertes > muchos y soltarlos.",
     "Un día a la vez. Vas bien.",
     "Si hoy no salió perfecto, mañana seguimos.",
     "Lo importante: regresar al plan, sin culpa."
